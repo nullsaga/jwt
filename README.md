@@ -7,7 +7,7 @@ using various signing algorithms in Go. It supports the HS256, HS384, and HS512 
 To use this library, simply import it into your Go project:
 
 ```go
-go get github.com/yourusername/jwt-library
+go get github.com/staticless/jwt
 ```
 
 ## Example usage
