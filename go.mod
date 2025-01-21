@@ -1,3 +1,3 @@
-module github.com/staticless/jwt
+module github.com/nullsaga/jwt
 
 go 1.23
