@@ -61,7 +61,7 @@ func (t *Token) Make(claim MapClaim) (string, error) {
 }
 
 func (t *Token) Verify(token string) (map[string]any, error) {
-	parts := strings.Split(token, ".")
+	parts := strings.SplitN(token, ".", 3)
 	if len(parts) != 3 {
 		return nil, errors.New("invalid token format")
 	}
