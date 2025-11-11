@@ -19,31 +19,43 @@ package main
 import (
 	"fmt"
 	"time"
+
 	"github.com/staticless/jwt"
 )
 
+// Define a custom claim type implementing jwt.Claim
+type MyClaim struct {
+	Sub    string `json:"sub"`
+	Expire int64  `json:"exp"`
+}
+
+// Exp method required by jwt.Claim
+func (c *MyClaim) Exp() int64 {
+	return c.Expire
+}
+
 func main() {
-	// Create a new HS256 signer
-	token := jwt.New(jwt.NewHS256Signer(), []byte("longsecret"))
+	token := jwt.New[*MyClaim](jwt.NewHS256Signer(), []byte("longsecret"))
 	
-	// Create a JWT with custom claims
-	jwToken, err := token.Make(map[string]any{
-		"sub": "123",  // Subject
-		"exp": time.Now().Add(10 * time.Second).Unix(), // Expiration time
-	})
-
-	if err != nil {
-		fmt.Println(err)
-		return
+	claim := &MyClaim{
+		Sub:    "123",
+		Expire: time.Now().Add(10 * time.Second).Unix(),
 	}
-	
-	// Token verification
-	claims, err := token.Verify(jwToken)
+
+	jwToken, err := token.Make(claim)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("Error creating token:", err)
 		return
 	}
 
-	fmt.Println("Verified Claims:", claims)
+	fmt.Println("Generated Token:", jwToken)
+	
+	verifiedClaim, err := token.Verify(jwToken)
+	if err != nil {
+		fmt.Println("Error verifying token:", err)
+		return
+	}
+
+	fmt.Printf("Verified Claims: %+v\n", verifiedClaim)
 }
 ```
