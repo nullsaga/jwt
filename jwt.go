@@ -80,21 +80,18 @@ func (t *Token[T]) Verify(token string) (T, error) {
 		return zero, errors.New("signature verification failed")
 	}
 
-	payloadJson, err := base64.RawURLEncoding.DecodeString(parts[1])
+	payloadJSON, err := base64.RawURLEncoding.DecodeString(parts[1])
 	if err != nil {
 		return zero, fmt.Errorf("unable to decode claim: %w", err)
 	}
 
 	var payload T
-	err = json.Unmarshal(payloadJson, &payload)
-	if err != nil {
+	if err = json.Unmarshal(payloadJSON, &payload); err != nil {
 		return zero, fmt.Errorf("invalid claim json: %w", err)
 	}
 
-	if expClaim, ok := any(payload).(Claim); ok {
-		if time.Now().Unix() > expClaim.Exp() {
-			return zero, errors.New("token has expired")
-		}
+	if time.Now().Unix() > payload.Exp() {
+		return zero, errors.New("token has expired")
 	}
 
 	return payload, nil
